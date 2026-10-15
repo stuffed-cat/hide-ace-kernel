@@ -80,8 +80,15 @@ hide_proc_nodes() {
 
 # 主执行流程
 main() {
-    # 确保 procfs 已就绪
+
+    for i in $(seq 1 30); do
+        if [ "$(getprop sys.boot_completed)" = "1" ]; then
+            break
+        fi
+        sleep 1
+    done
     
+    # 确保 procfs 已就绪 
     for i in $(seq 1 15); do
         if [ -f /proc/inte_ko ] || [ -f /proc/inte_systbl ]; then
             break
