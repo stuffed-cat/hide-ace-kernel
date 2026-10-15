@@ -1,0 +1,6 @@
+id=hide-ace-kernel
+name=Hide ACE Kernel Interfaces
+version=1.0
+versionCode=1
+author=stuffed-cat
+description=Tencent has unexpectedly updated the kernel anti-cheat system for Android today, with the purpose of this module being to conceal the file API interfaces exposed by the anti-cheat module
