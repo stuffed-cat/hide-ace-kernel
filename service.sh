@@ -80,9 +80,14 @@ hide_proc_nodes() {
 
 # 主执行流程
 main() {
-    # 等待系统完全启动，确保 procfs 已就绪
-    sleep 10
+    # 确保 procfs 已就绪
     
+    for i in $(seq 1 15); do
+        if [ -f /proc/inte_ko ] || [ -f /proc/inte_systbl ]; then
+            break
+        fi
+        sleep 1
+    done
     init_env
     hide_proc_nodes
 }
