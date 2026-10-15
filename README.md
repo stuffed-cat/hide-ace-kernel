@@ -17,17 +17,11 @@ This project is licensed under the **GNU Affero General Public License v3.0 (AGP
 
 ## 📌 Overview
 
-This KernelSU module is designed to counteract the recent unexpected updates to Tencent's kernel-level anti-cheat system on Android. It works by concealing the specific `/proc` file API interfaces that the anti-cheat kernel module exposes to user space.
+This KernelSU module is designed to counteract the recent unexpected updates to Tencent's kernel-level anti-cheat system on Android. It works by unloading the `inte` kernel module after boot.
 
-By bind-mounting empty files over these interfaces, the module ensures that any user-space application (including games and anti-cheat clients) reading these nodes receives an "empty" response, effectively simulating a "clean" system state where no integrity violations are reported.
+## 🎯 Targeted Component
 
-## 🎯 Targeted Interfaces
-
-The module hides the following proc nodes identified in the Oplus/Tencent kernel security check module (`oplus_kernel_security_check.c`):
-
--   `/proc/inte_ko`: Reports integrity issues with loaded Kernel Objects (KO).
--   `/proc/inte_systbl`: Reports tampering with the System Call Table.
--   `/proc/inte_status`: Used for internal boot stage signaling.
+The module targets the `inte` kernel module that exposes the related proc nodes used by the Oplus/Tencent kernel security check path.
 
 ## 🚀 Installation
 
@@ -39,25 +33,22 @@ The module hides the following proc nodes identified in the Oplus/Tencent kernel
 
 ## 🔍 Verification
 
-After rebooting, you can verify the module is working by checking if the target files return empty content:
+After rebooting, you can verify the module is working by checking whether the `inte` module is no longer loaded:
 
 ```bash
 su
-cat /proc/inte_ko
-cat /proc/inte_systbl
-cat /proc/inte_status
+rmmod inte
 ```
 
 **Expected Output:**
-*   No output (empty string).
-*   If you see error messages like "No such file or directory," ensure the kernel module is actually loaded on your device. The module safely skips non-existent files.
+*   No output if the module is already unloaded.
+*   If you see an error, the module may not be loaded or the current shell may not have sufficient permissions.
 
 ## 🛡️ How It Works
 
-1.  **Detection**: The script identifies the target `/proc` files.
-2.  **Preparation**: It creates empty dummy files in `/data/local/tmp/.ksu_hide_ace/`.
-3.  **Mounting**: It uses `mount --bind` to overlay the empty dummy files onto the real proc nodes.
-4.  **Result**: User-space processes reading these nodes see an empty file, interpreting it as "no anomalies detected."
+1.  **Detection**: The script waits for boot completion.
+2.  **Action**: It runs `rmmod inte` to unload the kernel module.
+3.  **Result**: The proc nodes exposed by that module disappear with it.
 
 ## ⚖️ Disclaimer
 
